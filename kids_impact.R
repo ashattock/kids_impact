@@ -125,10 +125,9 @@ pull_crossref = function(idx, pb) {
   affil = grepl(kids_ref, data$author[[this]]$affiliation[[1]])
   
   # Append outcomes to result datatable
-  result %<>% mutate(citations = cites, affil = isTRUE(affil))
-  
-  # Update progress bar
-  pb$tick()
+  result %<>% mutate(
+    citations = cites, 
+    kids_lead = isTRUE(affil))
   
   return(result)
 }
@@ -212,23 +211,23 @@ message(" - PDF input file: '", pdf_file, "'")
 message(" - Papers identified: ", n_papers)
 message(" - Impact method: ", pull_from)
 
-# Set of papers to examine
-idx = seq_along(titles)
-
-# Reference function to do the heavy lifting
-pull_fn = get(paste0("pull_", pull_from))
-
 # Initiate progress bar from progress package
 pb = progress_bar$new(
   format     = " [:bar] :percent (remaining: :eta)",
-  total      = length(idx), # Number of tasks to complete
+  total      = n_papers, # Number of tasks to complete
   complete   = "-",   # Completion bar character
   incomplete = " ",   # Incomplete bar character
   current    = ">",   # Current bar character
   clear      = TRUE,  # If TRUE, clears the bar when finished
   width      = 125)   # Width of the progress bar
 
+# Reference function to do the heavy lifting
+pull_fn = get(paste0("pull_", pull_from))
+
 # ---- Pull data for each paper ----
+
+# Set of papers to examine
+idx = 1 : n_papers
 
 # Apply function, and rank by number of citations
 results_dt = lapply(idx, pull_fn, pb = pb) %>%
