@@ -22,15 +22,14 @@ pdf_file = "2024 The Kids Publications complete"
 # Which database to pull impact info from
 pull_from = "scopus"  # OPTIONS: "crossref" or "scopus"
 
-# Display top n results (by number of citations)
-top_n_results = 10
-
-# Define API keys
-api_key = list(
-  scopus = "6266bdec9dc0002d63a127ec7487b751")
+# Define Elsevier API key
+api_key = "paste_your_api_key_here"
 
 # Regular expression for The Kids affiliation
 kids_ref = "Telethon Kids Institute|Kids Research Institute"
+
+# Display top n results (by number of citations)
+top_n_results = 10
 
 # ---- Load packages ----
 
@@ -136,6 +135,10 @@ pull_crossref = function(idx, pb) {
 
 # ---- Scopus ----
 
+# Throw an error if no API key has been set
+if (pull_from == "scopus" && is.na(api_key))
+  stop("Create and set an Elsevier API key: dev.elsevier.com")
+
 # Function to pull Scopus info
 pull_scopus = function(idx, pb) {
   
@@ -151,7 +154,7 @@ pull_scopus = function(idx, pb) {
   
   # Query with API key
   headers = add_headers(
-    "X-ELS-APIKey" = api_key$scopus, 
+    "X-ELS-APIKey" = api_key, 
     Accept = "application/json")
   
   # Pull from the API
@@ -331,7 +334,8 @@ results_dt %>%
   slice_head(n = top_n_results) %>%
   mutate(citations = paste0("[", citations, " citations]"), 
          kids_lead = ifelse(kids_lead, "*The Kids lead*", "")) %>%
-  mutate(str = paste(" #", rank, citations, kids_lead, title)) %>%
+  # mutate(str = paste(" #", rank, citations, kids_lead, title)) %>%
+  mutate(str = paste(" #", rank, citations, title)) %>%
   pull(str) %>%
   paste(collapse = "\n") %>%
   message()
