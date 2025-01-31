@@ -83,6 +83,9 @@ titles = papers %>%
 # Function to pull Scopus info
 pull_crossref = function(idx, pb) {
   
+  # Update progress bar
+  pb$tick()
+  
   # Preallocate trivial result
   result = data.table(idx = idx)
   
@@ -95,9 +98,6 @@ pull_crossref = function(idx, pb) {
   
   # Pull from the API
   info = GET(paste0(api, query))
-  
-  # Update progress bar
-  pb$tick()
   
   # Return out if no success
   if (status_code(info) != 200)
@@ -142,6 +142,9 @@ if (pull_from == "scopus" && is.na(api_key))
 # Function to pull Scopus info
 pull_scopus = function(idx, pb) {
   
+  # Update progress bar
+  pb$tick()
+  
   # Preallocate trivial result
   result = data.table(idx = idx)
   
@@ -159,9 +162,6 @@ pull_scopus = function(idx, pb) {
   
   # Pull from the API
   info = GET(paste0(api, query), headers)
-  
-  # Update progress bar
-  pb$tick()
   
   # Return out if no success
   if (status_code(info) != 200)
